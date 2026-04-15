@@ -36,7 +36,7 @@ export async function handleWebhook(req: Request, res: Response): Promise<void> 
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Find the PENDING payment for this booking
       const payment = await tx.payment.findFirst({
         where: { booking_id, status: 'PENDING' },

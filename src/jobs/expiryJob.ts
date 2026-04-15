@@ -26,14 +26,14 @@ export async function runExpiryJob(): Promise<void> {
 
     if (expiredSeats.length === 0) return;
 
-    const expiredSeatIds = expiredSeats.map((s) => s.id);
+    const expiredSeatIds = expiredSeats.map((s: any) => s.id);
 
     console.log(
       `[ExpiryJob] Expiring ${expiredSeatIds.length} seat(s): ${expiredSeatIds.join(', ')}`
     );
 
     // Atomically update seats and bookings in a single transaction
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Reset seats to AVAILABLE
       await tx.seat.updateMany({
         where: { id: { in: expiredSeatIds }, status: 'RESERVED' },

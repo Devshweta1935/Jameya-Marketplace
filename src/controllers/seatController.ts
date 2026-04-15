@@ -57,7 +57,7 @@ export async function reserveSeat(req: Request, res: Response): Promise<void> {
 
   try {
     // Steps 3–7 — Atomic DB transaction
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: any) => {
       // Step 4 — SELECT FOR UPDATE: row-level lock prevents phantom reads in concurrent txns
       const seats = await tx.$queryRaw<
         { id: string; status: string }[]
