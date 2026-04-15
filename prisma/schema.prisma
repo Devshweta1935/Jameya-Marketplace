@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SeatStatus {
+  AVAILABLE
+  RESERVED
+  BOOKED
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model Jameya {
+  id               String   @id @default(uuid())
+  name             String
+  monthly_amount   Decimal  @db.Decimal(12, 2)
+  duration_months  Int
+  featured         Boolean  @default(false)
+  created_at       DateTime @default(now())
+  seats            Seat[]
+
+  @@map("jameyas")
+}
+
+model Seat {
+  id           String     @id @default(uuid())
+  jameya_id    String
+  seat_number  Int
+  price        Decimal    @db.Decimal(12, 2)
+  status       SeatStatus @default(AVAILABLE)
+  reserved_by  String?
+  expires_at   DateTime?
+  jameya       Jameya     @relation(fields: [jameya_id], references: [id])
+  bookings     Booking[]
+
+  @@map("seats")
+}
+
+model Booking {
+  id         String        @id @default(uuid())
+  user_id    String
+  seat_id    String
+  status     BookingStatus @default(PENDING_PAYMENT)
+  expires_at DateTime
+  seat       Seat          @relation(fields: [seat_id], references: [id])
+  payments   Payment[]
+
+  @@map("bookings")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  booking_id        String
+  status            PaymentStatus @default(PENDING)
+  provider_event_id String?       @unique
+  idempotency_key   String        @unique
+  created_at        DateTime      @default(now())
+  booking           Booking       @relation(fields: [booking_id], references: [id])
+
+  @@map("payments")
+}
